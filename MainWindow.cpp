@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include <CommCtrl.h>
+#include <iostream>
 #include <shellapi.h>
 
 MainWindow::MainWindow(HINSTANCE hInstance) : m_hInstance(hInstance), m_pRecycleBin(nullptr) {}
@@ -15,7 +16,7 @@ void MainWindow::Show(int nCmdShow) {
 
     // Register window class
     WNDCLASS wc = { };
-    wc.lpfnWndProc = MainWindow::WndProc;
+    wc.lpfnWndProc = WndProc;
     wc.hInstance = m_hInstance;
     wc.lpszClassName = L"RecycleBinApp";
     wc.hIcon = hIconFull; // Use full recycle bin icon for the window
@@ -71,9 +72,18 @@ LRESULT CALLBACK MainWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
         for (UINT i = 0; i < nFiles; i++) {
             DragQueryFile(hDrop, i, szFileName, MAX_PATH);
             // Move file to recycle bin
-            if (MainWindow* pThis = reinterpret_cast<MainWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA))) {
+            std::wcout << L"Dropped file: " << szFileName << std::endl;
+
+            // Move file to recycle bin (faked)
+            if (pThis && pThis -> m_pRecycleBin)
+            {
                 pThis->m_pRecycleBin->MoveToRecycleBin(szFileName);
             }
+            else
+            {
+                std::wcerr << L"RecycleBin instance is not initialized" << std::endl;
+            }
+
         }
 
         DragFinish(hDrop);
