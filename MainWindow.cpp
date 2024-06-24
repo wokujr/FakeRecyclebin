@@ -24,9 +24,11 @@ void MainWindow::Show(int nCmdShow) {
 
     // Create main window
     m_hWnd = CreateWindowEx(0, L"RecycleBinApp", L"Fake Recycle Bin", WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 600, 400, NULL, NULL, m_hInstance, NULL);
+        CW_USEDEFAULT, CW_USEDEFAULT, 600, 400, NULL, NULL, m_hInstance, this);
 
     if (!m_hWnd) return;
+
+    SetWindowLongPtr(m_hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
     ShowWindow(m_hWnd, nCmdShow);
     UpdateWindow(m_hWnd);
@@ -47,6 +49,8 @@ void MainWindow::Show(int nCmdShow) {
 }
 
 LRESULT CALLBACK MainWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    MainWindow* pThis = reinterpret_cast<MainWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+
     switch (message) {
     case WM_CREATE: {
         // Create list view control
@@ -57,7 +61,7 @@ LRESULT CALLBACK MainWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
     }
     case WM_DROPFILES: {
         // Handle dropped files
-        HDROP hDrop;
+        HDROP hDrop = (HDROP)wParam;
         wchar_t szFileName[MAX_PATH];
         UINT nFiles;
 
