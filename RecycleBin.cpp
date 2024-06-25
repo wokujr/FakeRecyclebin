@@ -58,7 +58,7 @@ void RecycleBin::DeleteFromRecycleBin(const wchar_t* filepath)
 }
 
 std::wstring RecycleBin::getOriginalPath(const wchar_t* filePath) {
-	std::wstring metadataFile = std::wstring(filePath) + L".meta";
+	std::wstring metadataFile = std::wstring(filePath);
 	std::wifstream inFile(metadataFile);
 	if (!inFile.is_open()) {
 		return L"";
@@ -73,7 +73,7 @@ std::wstring RecycleBin::getOriginalPath(const wchar_t* filePath) {
 
 void RecycleBin::SaveOriginalPath(const wchar_t* filePath, const std::wstring& originalPath)
 {
-	std::wstring metadataFile = std::wstring(filePath) + L".meta";
+	std::wstring metadataFile = std::wstring(filePath);
 	std::wofstream outFile(metadataFile);
 	if (!outFile.is_open())
 	{
