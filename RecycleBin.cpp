@@ -18,13 +18,20 @@ void RecycleBin::MoveToRecycleBin(const wchar_t* filepath)
 	SHFILEOPSTRUCT fileOp;
 	ZeroMemory(&fileOp, sizeof(fileOp));
 	fileOp.hwnd = m_hWnd;
-	fileOp.wFunc = FO_DELETE;
-	fileOp.pFrom = filepath;
-	fileOp.fFlags = FOF_ALLOWUNDO | FOF_SILENT | FOF_NOCONFIRMATION;
+	fileOp.wFunc = FO_MOVE;
+	std::wstring fromPath(filepath);
+	fromPath.append(1, L'\0'); // Double-null termination
+	fileOp.pFrom = fromPath.c_str();
+	std::wstring toPath = L"D:\\original\\";
+	toPath.append(fromPath.substr(fromPath.find_last_of(L"\\") + 1));
+	toPath.append(1, L'\0'); // Double-null termination
+	fileOp.pTo = toPath.c_str();
+	fileOp.fFlags = FOF_NOCONFIRMATION | FOF_SILENT;
 
-	SaveOriginalPath(filepath, filepath);
-
-	SHFileOperation(&fileOp);
+	int result = SHFileOperation(&fileOp);
+	if (result != 0) {
+		MessageBox(m_hWnd, L"Failed to move file to fake recycle bin!", L"Error", MB_ICONERROR);
+	}
 }
 
 void RecycleBin::RestoreFromRecycleBin(const wchar_t* filepath)
